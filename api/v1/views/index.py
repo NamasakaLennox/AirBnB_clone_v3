@@ -23,9 +23,12 @@ def stats():
     from models.review import Review
     from models.user import User
 
-    return jsonify(amenities=storage.count(Amenity),
-                   cities=storage.count(City),
-                   places=storage.count(Place),
-                   reviews=storage.count(Review),
-                   states=storage.count(State),
-                   users=storage.count(User))
+    models = {"amenities": Amenity, "cities": City, "places": Place,
+              "states": State, "reviews": Review, "users": User}
+    model_count = {}
+
+    for model_name, model in models.items():
+        count = storage.count(model)
+        model_count[model_name] = count
+
+    return jsonify(model_count)
