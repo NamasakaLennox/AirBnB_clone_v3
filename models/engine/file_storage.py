@@ -55,7 +55,7 @@ class FileStorage:
                 jo = json.load(f)
             for key in jo:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
-        except:
+        except Exception:
             pass
 
     def delete(self, obj=None):
@@ -65,35 +65,37 @@ class FileStorage:
             if key in self.__objects:
                 del self.__objects[key]
 
+    def count(self, cls=None):
+        """
+        counts the number of items in storage
+        """
+        from models import storage
+        all_class = classes.values()
+
+        if not cls:
+            count = 0
+            for clas in all_class:
+                count += len(storage.all(clas).values())
+        else:
+            count = len(storage.all(cls).values())
+
+        return count
+
+    def get(self, cls, id):
+        """
+        gets a specific item in storage
+        """
+        from models import storage
+        if cls not in classes.values():
+            return None
+
+        all_cls = storage.all(cls)
+        for value in all_cls.values():
+            if (value.id == id):
+                return value
+
+        return None
+
     def close(self):
         """call reload() method for deserializing the JSON file to objects"""
         self.reload()
-
-    def get(self, cls, id):
-        """method to retrieve one object
-         params:
-        --------
-            cls: class
-            id: string representing the object ID
-        """
-        if cls not in classes.values():
-            return None
-        for obj in self.__objects.values():
-            if obj.id == id:
-                return obj
-        return None
-
-    def count(self, cls=None):
-        """method to count the number of objects in storage
-        params:
-        -------
-            cls: class (optional)
-        """
-        count = 0
-        if cls is None:
-            return len(self.__objects)
-        if cls in classes.values():
-            for obj in self.__objects.values():
-                if obj.__class__ == cls:
-                    count += 1
-        return count

@@ -1,34 +1,38 @@
 #!/usr/bin/python3
-"""This module creates a new view for State objects that handles all default
-    RestFul API actions.
 """
-from flask import jsonify
+index file
+"""
 from api.v1.views import app_views
+from flask import jsonify
+from models.amenity import Amenity
+from models.city import City
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.user import User
+from models import storage
+classes = {"amenities": Amenity, "cities": City, "places": Place,
+           "reviews": Review, "states": State, "users": User}
 
 
-@app_views.route('/status', strict_slashes=False)
+@app_views.route('/status')
 def status():
-    """This function returns a JSON response."""
-    return jsonify({"status": "OK"})
+    """returns the status of the app
+    """
+    obj = {"status": "OK"}
+    return (jsonify(obj))
 
 
-@app_views.route('/stats', strict_slashes=False)
-def stats():
-    """This function returns a JSON response."""
-    from models import storage
-    from models.amenity import Amenity
-    from models.city import City
-    from models.place import Place
-    from models.state import State
-    from models.review import Review
-    from models.user import User
+@app_views.route('/stats')
+def count():
+    """
+    counts the numbrer of objects in the database
+    """
+    keys = classes.keys()
+    values = classes.values()
+    obj = {}
+    for key, val in zip(keys, values):
+        num = storage.count(val)
+        obj[key] = num
 
-    models = {"amenities": Amenity, "cities": City, "places": Place,
-              "states": State, "reviews": Review, "users": User}
-    model_count = {}
-
-    for model_name, model in models.items():
-        count = storage.count(model)
-        model_count[model_name] = count
-
-    return jsonify(model_count)
+    return (jsonify(obj))
