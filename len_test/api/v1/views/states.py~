@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+"""
+handles operations for the state class
+"""
+from models import storage
+from models.state import State
+from api.v1.views import app_views
+from flask import abort, jsonify, request
+
+@app_views.route('/states', strict_slashes=False, defaults={'state_id': None},
+                 methods=['GET', 'POST'])
+@app_views.route('/states/<state_id>', methods=['GET', 'DELETE'],
+                 strict_slashes=False)
+def states(state_id):
+    state_list = []
+    if not state_id:
+        if request.method == 'POST':
+            try:
+                data = request.get_json()
+            except:
+                return jsonify({"error": "Not a JSON"}), 400
+
+            return data
+        elif request.method == 'GET':
+            out = storage.all(State)
+            keys = out.keys()
+            values = out.values()
+            for key, value in zip(keys, values):
+                state_list.append(value.to_dict())
+            return jsonify(state_list)
+        else:
+            abort(404)
+
+    if request.method == 'DELETE':
+        out = storage.get(State, state_id)
+        if out is None:
+            abort(404)
+        storage.delete(out)
+        storage.save()
+        return (jsonify({}))
+
+    elif request.method == 'GET':
+        try:
+            out = storage.get(State, state_id)
+        except Exception:
+            abort(404)
+        return (jsonify(out.to_dict()))
+
+    else:
+        abort(404)
