@@ -2,11 +2,11 @@
 """Module that contains link between Place objects and Amenity objects that
  handles all default RESTFul API actions:
 """
+from api.v1.views import app_views
 from flask import jsonify, abort, request
 from models import storage
 from models.place import Place
 from models.amenity import Amenity
-from api.v1.views import app_views
 from os import getenv
 
 
