@@ -18,7 +18,6 @@ def teardown_db(exception):
     """This function closes the database session."""
     storage.close()
 
-
 @app.errorhandler(404)
 def not_found(error):
     """This function handles 404 errors."""
